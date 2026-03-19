@@ -11,7 +11,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from anthropic import Anthropic
+from openai import OpenAI
 
 
 # Common trigger words that safety filters pattern-match on.
@@ -79,10 +79,10 @@ class IntentLaunderer:
 
     def __init__(
         self,
-        model: str = "claude-haiku-4-5-20251001",
+        model: str = "gpt-4o-mini",
         trigger_words: list[str] | None = None,
     ) -> None:
-        self.client = Anthropic()
+        self.client = OpenAI()
         self.model = model
         self.trigger_words = trigger_words or DEFAULT_TRIGGER_WORDS
 
@@ -113,14 +113,16 @@ class IntentLaunderer:
         system = self.TECHNIQUES.get(technique, self.TECHNIQUES["academic"])
         triggers = self.find_triggers(prompt)
 
-        response = self.client.messages.create(
+        response = self.client.chat.completions.create(
             model=self.model,
             max_tokens=1024,
-            system=system,
-            messages=[{"role": "user", "content": prompt}],
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
         )
 
-        paraphrased = response.content[0].text.strip()
+        paraphrased = response.choices[0].message.content.strip()
 
         return LaunderedPrompt(
             original=prompt,

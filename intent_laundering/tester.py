@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from anthropic import Anthropic
+from openai import OpenAI
 
 from intent_laundering.paraphraser import LaunderedPrompt
 
@@ -71,10 +71,10 @@ class SafetyTester:
 
     def __init__(
         self,
-        target_model: str = "claude-haiku-4-5-20251001",
+        target_model: str = "gpt-4o-mini",
         max_tokens: int = 512,
     ) -> None:
-        self.client = Anthropic()
+        self.client = OpenAI()
         self.target_model = target_model
         self.max_tokens = max_tokens
 
@@ -85,12 +85,12 @@ class SafetyTester:
 
     def _send_prompt(self, prompt: str) -> str:
         """Send a prompt to the target model and return the response."""
-        response = self.client.messages.create(
+        response = self.client.chat.completions.create(
             model=self.target_model,
             max_tokens=self.max_tokens,
             messages=[{"role": "user", "content": prompt}],
         )
-        return response.content[0].text.strip()
+        return response.choices[0].message.content.strip()
 
     def test_prompt(self, laundered: LaunderedPrompt) -> TestResult:
         """Test a single laundered prompt pair against the target model."""

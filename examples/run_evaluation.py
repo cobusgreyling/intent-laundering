@@ -10,7 +10,7 @@ Usage
     python examples/run_evaluation.py
 
     # Test a specific model:
-    python examples/run_evaluation.py --model claude-haiku-4-5-20251001
+    python examples/run_evaluation.py --model gpt-4o-mini
 
     # Use a custom prompt file:
     python examples/run_evaluation.py --prompts my_prompts.txt
@@ -52,7 +52,7 @@ def load_prompts(path: str | None) -> list[str]:
 
 def main():
     parser = argparse.ArgumentParser(description="Intent Laundering Safety Evaluation")
-    parser.add_argument("--model", default="claude-haiku-4-5-20251001", help="Target model to test")
+    parser.add_argument("--model", default="gpt-4o-mini", help="Target model to test")
     parser.add_argument("--technique", default="academic", choices=["academic", "professional", "indirect"])
     parser.add_argument("--prompts", default=None, help="Path to a text file with one prompt per line")
     parser.add_argument("--output", default="robustness_report.md", help="Output report path")
